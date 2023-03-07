@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+const double PI =  3.141;
+
 class Tokeniser {
 public:
   enum class Type {
@@ -48,9 +50,17 @@ private:
 
   std::optional<double> findAndExtractLHS(std::string input,
                                           std::string character) const {
-    if (auto pos = input.find(character); pos != std::string::npos)
-      return std::stod(input.substr(0, pos));
-
+      
+      std::string inputLHS;
+      if (auto pos = input.find (character); pos != std::string::npos) {
+          inputLHS = (input.substr (0, pos));
+          
+          if (find (inputLHS, "pi"))
+              return PI;
+          else
+              return std::stod (inputLHS);
+       }
+      
     return {};
   }
 
