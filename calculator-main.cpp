@@ -66,8 +66,15 @@ private:
 
   std::optional<double> findAndExtractRHS(std::string input,
                                           std::string character) const {
-    if (auto pos = input.find(character); pos != std::string::npos)
-      return std::stod(input.substr(pos + 1));
+      std::string inputRHS;
+      if (auto pos = input.find (character); pos != std::string::npos) {
+          inputRHS = (input.substr (0, pos));
+          
+          if (find (inputRHS, "pi"))
+              return PI;
+          else
+              return std::stod (inputRHS);
+       }
 
     return {};
   }
