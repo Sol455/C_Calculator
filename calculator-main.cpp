@@ -13,6 +13,7 @@ public:
     add,
     subtract,
     multiply,
+    divide,
 
     unknown,
   };
@@ -55,8 +56,10 @@ private:
       if (auto pos = input.find (character); pos != std::string::npos) {
           inputLHS = (input.substr (0, pos));
           
+          //search input for pi, return PI constant if found
           if (find (inputLHS, "pi"))
               return PI;
+          //if pi not found, convert input to double and return
           else
               return std::stod (inputLHS);
        }
@@ -68,7 +71,7 @@ private:
                                           std::string character) const {
       std::string inputRHS;
       if (auto pos = input.find (character); pos != std::string::npos) {
-          inputRHS = (input.substr (0, pos));
+          inputRHS = (input.substr (pos + 1));
           
           if (find (inputRHS, "pi"))
               return PI;
@@ -86,6 +89,8 @@ private:
       return Type::subtract;
     if (find(input, "*"))
       return Type::multiply;
+    if (find(input, "/"))
+      return Type::divide;
 
     return Type::unknown;
   }
@@ -99,6 +104,9 @@ private:
 
     if (auto result = findAndExtractLHS(input, "*"))
       return result;
+      
+    if (auto result = findAndExtractLHS(input, "/"))
+      return result;
 
     return {};
   }
@@ -111,6 +119,9 @@ private:
       return result;
 
     if (auto result = findAndExtractRHS(input, "*"))
+      return result;
+      
+    if (auto result = findAndExtractRHS(input, "/"))
       return result;
 
     return {};
@@ -130,6 +141,8 @@ public:
       return tokens.lhs - tokens.rhs;
     case Tokeniser::Type::multiply:
       return tokens.lhs * tokens.rhs;
+    case Tokeniser::Type::divide:
+      return tokens.lhs / tokens.rhs;
     default:
       break;
     }
