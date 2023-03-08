@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-const double PI =  3.141;
+const double PI =  3.141592;
 
 class Tokeniser {
 public:
@@ -220,12 +220,12 @@ void test() {
   //PI Tests
   result = Tokeniser().tokenise("pi * 5");
   assert(result.has_value());
-  ResultChecker::check(result->lhs, 3.141);
+  ResultChecker::check(result->lhs, 3.141592);
   ResultChecker::check(result->rhs, 5);
   assert(result->type == Tokeniser::Type::multiply);
     
   ResultChecker::check(
-    Calculator().calculate({3.141, 5, Tokeniser::Type::multiply}), 15.70796);
+    Calculator().calculate({3.141592, 5, Tokeniser::Type::multiply}), 15.70796);
 }
 
 void run() {
