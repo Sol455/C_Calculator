@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 const double PI =  3.141592;
 
@@ -175,7 +176,7 @@ public:
 private:
   void processInput(std::string input) const {
     if (auto tokens = Tokeniser().tokenise(input))
-      std::cout << "Answer: " << Calculator().calculate(*tokens) << std::endl;
+      std::cout << std::setprecision(7) << "Answer: " << Calculator().calculate(*tokens) << std::endl;
     else
       std::cout << "There was an error in the input string, please try again..."
                 << std::endl;
