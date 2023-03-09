@@ -4,6 +4,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iomanip>
+
+const double PI =  3.141592;
 
 class Tokeniser {
 public:
@@ -11,6 +14,7 @@ public:
     add,
     subtract,
     multiply,
+    divide,
 
     unknown,
   };
@@ -48,16 +52,33 @@ private:
 
   std::optional<double> findAndExtractLHS(std::string input,
                                           std::string character) const {
-    if (auto pos = input.find(character); pos != std::string::npos)
-      return std::stod(input.substr(0, pos));
-
+      
+      std::string inputLHS;
+      if (auto pos = input.find (character); pos != std::string::npos) {
+          inputLHS = (input.substr (0, pos));
+          
+          //search input for pi, return PI constant if found
+          if (find (inputLHS, "pi"))
+              return PI;
+          //if pi not found, convert input to double and return
+          else
+              return std::stod (inputLHS);
+       }
+      
     return {};
   }
 
   std::optional<double> findAndExtractRHS(std::string input,
                                           std::string character) const {
-    if (auto pos = input.find(character); pos != std::string::npos)
-      return std::stod(input.substr(pos + 1));
+      std::string inputRHS;
+      if (auto pos = input.find (character); pos != std::string::npos) {
+          inputRHS = (input.substr (pos + 1));
+          
+          if (find (inputRHS, "pi"))
+              return PI;
+          else
+              return std::stod (inputRHS);
+       }
 
     return {};
   }
@@ -69,6 +90,8 @@ private:
       return Type::subtract;
     if (find(input, "*"))
       return Type::multiply;
+    if (find(input, "/"))
+      return Type::divide;
 
     return Type::unknown;
   }
@@ -82,6 +105,9 @@ private:
 
     if (auto result = findAndExtractLHS(input, "*"))
       return result;
+      
+    if (auto result = findAndExtractLHS(input, "/"))
+      return result;
 
     return {};
   }
@@ -94,6 +120,9 @@ private:
       return result;
 
     if (auto result = findAndExtractRHS(input, "*"))
+      return result;
+      
+    if (auto result = findAndExtractRHS(input, "/"))
       return result;
 
     return {};
@@ -113,6 +142,8 @@ public:
       return tokens.lhs - tokens.rhs;
     case Tokeniser::Type::multiply:
       return tokens.lhs * tokens.rhs;
+    case Tokeniser::Type::divide:
+      return tokens.lhs / tokens.rhs;
     default:
       break;
     }
@@ -145,7 +176,7 @@ public:
 private:
   void processInput(std::string input) const {
     if (auto tokens = Tokeniser().tokenise(input))
-      std::cout << "Answer: " << Calculator().calculate(*tokens) << std::endl;
+      std::cout << std::setprecision(7) << "Answer: " << Calculator().calculate(*tokens) << std::endl;
     else
       std::cout << "There was an error in the input string, please try again..."
                 << std::endl;
@@ -183,7 +214,19 @@ void test() {
   ResultChecker::check(
       Calculator().calculate({25.3, 18.6, Tokeniser::Type::add}), 43.9);
   ResultChecker::check(
-      Calculator().calculate({3, 5.6, Tokeniser::Type::subtract}), 2.6);
+      Calculator().calculate({3, 5.6, Tokeniser::Type::subtract}), -2.6);
+  ResultChecker::check(
+      Calculator().calculate({10, 4, Tokeniser::Type::divide}), 2.5);
+    
+  //PI Tests
+  result = Tokeniser().tokenise("pi * 5");
+  assert(result.has_value());
+  ResultChecker::check(result->lhs, 3.141592);
+  ResultChecker::check(result->rhs, 5);
+  assert(result->type == Tokeniser::Type::multiply);
+    
+  ResultChecker::check(
+    Calculator().calculate({3.141592, 5, Tokeniser::Type::multiply}), 15.70796);
 }
 
 void run() {
